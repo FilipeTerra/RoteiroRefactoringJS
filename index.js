@@ -9,8 +9,8 @@ function gerarFaturaStr (fatura) {
     for (let apre of fatura.apresentacoes) {
         faturaStr += `${getPeca(apre).nome}: ${formatarMoeda(calcularTotalApresentacao(apre))} (${apre.audiencia} assentos)\n`;
     }
-    faturaStr += `Valor total: ${formatarMoeda(calcularTotalFatura())}\n`;
-    faturaStr += `Créditos acumulados: ${calcularTotalCreditos()} \n`;
+    faturaStr += `Valor total: ${formatarMoeda(calcularTotalFatura(fatura))}\n`;
+    faturaStr += `Créditos acumulados: ${calcularTotalCreditos(fatura)} \n`;
     return faturaStr;
   }
 
@@ -36,17 +36,17 @@ function gerarFaturaStr (fatura) {
       return total;
   }
 
-  function calcularTotalCreditos() {
+  function calcularTotalCreditos(fatura) {
     let creditos = 0;
-    for (let apre of faturas.apresentacoes) {
+    for (let apre of fatura.apresentacoes) {
       creditos += calcularCredito(apre);
     }
     return creditos;
   }
 
-  function calcularTotalFatura() {
+  function calcularTotalFatura(fatura) {
     let total = 0;
-    for (let apre of faturas.apresentacoes) {
+    for (let apre of fatura.apresentacoes) {
       total += calcularTotalApresentacao(apre)
     }
     return total;
