@@ -4,25 +4,13 @@ function getPeca(apresentacao) {
     return pecas[apresentacao.id];
   }
 
-function gerarFaturaStr (fatura, pecas) {
-    let totalFatura = 0;
-    let creditos = 0;
+function gerarFaturaStr (fatura) {
     let faturaStr = `Fatura ${fatura.cliente}\n`;
-  
     for (let apre of fatura.apresentacoes) {
-      let total = calcularTotalApresentacao(apre);
-
-      // créditos para próximas contratações
-      creditos += calcularCredito(apre);
-  
-      // mais uma linha da fatura
-      faturaStr += `  ${getPeca(apre).nome}: ${formatarMoeda(total)} (${apre.audiencia} assentos)\n`;
-      totalFatura += total;
+        faturaStr += `${getPeca(apre).nome}: ${formatarMoeda(calcularTotalApresentacao(apre))} (${apre.audiencia} assentos)\n`;
     }
-
-    faturaStr += `Valor total: ${formatarMoeda(totalFatura)}\n`;
-    faturaStr += `Créditos acumulados: ${creditos} \n`;
-
+    faturaStr += `Valor total: ${formatarMoeda(calcularTotalFatura())}\n`;
+    faturaStr += `Créditos acumulados: ${calcularTotalCreditos()} \n`;
     return faturaStr;
   }
 
@@ -48,19 +36,35 @@ function gerarFaturaStr (fatura, pecas) {
       return total;
   }
 
+  function calcularTotalCreditos() {
+    let creditos = 0;
+    for (let apre of faturas.apresentacoes) {
+      creditos += calcularCredito(apre);
+    }
+    return creditos;
+  }
+
+  function calcularTotalFatura() {
+    let total = 0;
+    for (let apre of faturas.apresentacoes) {
+      total += calcularTotalApresentacao(apre)
+    }
+    return total;
+  }
+
   function calcularCredito(apre) {
       let creditos = 0;
       creditos += Math.max(apre.audiencia - 30, 0);
       if (getPeca(apre).tipo === "comedia") 
          creditos += Math.floor(apre.audiencia / 5);
       return creditos;   
-    }
+  }
 
    function formatarMoeda(valor) {
       return new Intl.NumberFormat("pt-BR",
         { style: "currency", currency: "BRL",
           minimumFractionDigits: 2 }).format(valor/100);
-    } 
+  } 
 
 const faturas = JSON.parse(readFileSync('./faturas.json'));
 const pecas = JSON.parse(readFileSync('./pecas.json'));
